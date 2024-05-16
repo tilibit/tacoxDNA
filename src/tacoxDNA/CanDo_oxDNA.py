@@ -4,7 +4,7 @@
 import sys
 import numpy as np
 
-from libs.readers import LorenzoReader
+from .libs.readers import LorenzoReader
 
 BASE_SHIFT = 1.13
 COM_SHIFT = 0.54
@@ -391,9 +391,7 @@ def parse_options():
         
     return opts
 
-
-
-if __name__ == '__main__':
+def main():
     opts = parse_options()
     
     s = load_and_convert(opts)
@@ -408,3 +406,7 @@ if __name__ == '__main__':
 
     print("## Wrote data to '%s' / '%s'" % (opts['cando_file'] + '.oxdna', opts['cando_file'] + '.top'), file=sys.stderr)
     print("## DONE", file=sys.stderr)
+
+if __name__ == '__main__':
+    main()
+

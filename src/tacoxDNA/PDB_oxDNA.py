@@ -5,8 +5,8 @@ import os
 import itertools
 import numpy as np
 
-from libs.pdb import Atom, Nucleotide, FROM_ANGSTROM_TO_OXDNA
-from libs import base
+from .libs.pdb import Atom, Nucleotide, FROM_ANGSTROM_TO_OXDNA
+from .libs import base
 
 def print_usage():
     print("USAGE:", file=sys.stderr)
@@ -47,7 +47,8 @@ def parse_options():
         
     return opts
 
-if __name__ == '__main__':
+
+def main():
     if len(sys.argv) < 3:
         print_usage()
         
@@ -149,3 +150,6 @@ if __name__ == '__main__':
     print("## Wrote data to '%s' / '%s'" % (configuration_file, topology_file), file=sys.stderr)
     print("## DONE", file=sys.stderr)
     
+
+if __name__ == '__main__':
+    main()

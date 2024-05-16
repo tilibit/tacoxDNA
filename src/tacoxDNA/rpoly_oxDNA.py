@@ -3,10 +3,10 @@
 import sys
 import re
 import os
-from libs.pyquaternion import Quaternion
+from .libs.pyquaternion import Quaternion
 import numpy as np
-from libs import cadnano_utils as cu
-from libs import base
+from .libs import cadnano_utils as cu
+from .libs import base
 
 
 class Options(object):
@@ -155,7 +155,7 @@ def parse_options():
 	return opts
 
 
-if __name__ == '__main__':
+def main():
 	if len(sys.argv) < 2:
 		print_usage()
 	
@@ -163,3 +163,7 @@ if __name__ == '__main__':
 	if opts.seed is not None:
 		np.random.seed(opts.seed)
 	rpoly_to_oxDNA(opts)
+
+
+if __name__ == '__main__':
+	main()

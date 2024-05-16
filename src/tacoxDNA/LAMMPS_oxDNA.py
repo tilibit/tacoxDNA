@@ -2,9 +2,9 @@
 
 import numpy as np
 import sys, os
-from libs import base
-from libs import reader_lammps_init 
-from libs.constants import mass_in_lammps, inertia_in_lammps, number_oxdna_to_lammps
+from .libs import base
+from .libs import reader_lammps_init 
+from .libs.constants import mass_in_lammps, inertia_in_lammps, number_oxdna_to_lammps
 
 
 def quat_to_exyz(myquat):
@@ -34,8 +34,7 @@ def quat_to_exyz(myquat):
 
     return mya1, mya3
 
-
-if __name__ == '__main__':
+def main():
     if len(sys.argv) < 2:
         print("USAGE:", file=sys.stderr)
         print("\t%s lammps_data_file [lammps_trajectory_file]" % sys.argv[0], file=sys.stderr)
@@ -169,3 +168,7 @@ if __name__ == '__main__':
 
     print("## Wrote data to '%s' / '%s'" % (configuration_file, topology_file), file=sys.stderr)
     print("## DONE", file=sys.stderr)
+
+
+if __name__ == '__main__':
+    main()
