@@ -1074,6 +1074,7 @@ def cadnano_oxdna(output_file, cadsys, lattice_type, input_sequences=None, side=
         nnucs_to_here[strandii] = nuc_total
         nuc_total += len(strand._nucleotides)
 
+    id_to_pos_info = {}
     id_to_pos = {}
     # fill in the _scaf and _stap dicts for the reverse vhelix_vbase_to_nucleotide object
     for vh, vb in list(vh_vb2nuc_final._scaf.keys()):
@@ -1082,7 +1083,8 @@ def cadnano_oxdna(output_file, cadsys, lattice_type, input_sequences=None, side=
         for nucii in nuciis:
             nuc = len(rev_sys._strands[strandii]._nucleotides) - 1 - (nucii - nnucs_to_here[strandii]) + nnucs_to_here[strandii]
             rev_nuciis.append(nuc)
-            id_to_pos[nuc] = (vh, vb, True)
+            id_to_pos_info[nuc] = (vh, vb, True)
+            id_to_pos[nuc] = (vh, vb)
         vh_vb2nuc_rev.add_scaf(vh, vb, strandii, rev_nuciis)
     for vh, vb in list(vh_vb2nuc_final._stap.keys()):
         strandii, nuciis = vh_vb2nuc_final._stap[(vh, vb)]
@@ -1090,7 +1092,8 @@ def cadnano_oxdna(output_file, cadsys, lattice_type, input_sequences=None, side=
         for nucii in nuciis:
             nuc = len(rev_sys._strands[strandii]._nucleotides) - 1 - (nucii - nnucs_to_here[strandii]) + nnucs_to_here[strandii]
             rev_nuciis.append(nuc)
-            id_to_pos[nuc] = (vh, vb, False)
+            id_to_pos_info[nuc] = (vh, vb, False)
+            id_to_pos[nuc] = (vh, vb)
 
         vh_vb2nuc_rev.add_stap(vh, vb, strandii, rev_nuciis)
 
@@ -1104,9 +1107,9 @@ def cadnano_oxdna(output_file, cadsys, lattice_type, input_sequences=None, side=
             return key_lst
         
         pos_to_id = {}
-        for pos in id_to_pos.values():
+        for pos in id_to_pos_info.values():
             if pos not in pos_to_id.keys():
-                pos_to_id[pos] = search_key(id_to_pos, pos)
+                pos_to_id[pos] = search_key(id_to_pos_info, pos)
 
         with open(output_file+"_cadnano2oxDNA_map.pickle", "wb") as map_dic:
             pickle.dump(pos_to_id, map_dic, protocol=pickle.HIGHEST_PROTOCOL)
