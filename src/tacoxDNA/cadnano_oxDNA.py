@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import json
 import os
 import pickle
 import re
@@ -619,9 +620,6 @@ class square(object):
 
         
 def parse_cadnano(path):
-    import json
-    
-    
     try:
         with open(path) as json_data:
             cadnano = json.load(json_data)
@@ -719,7 +717,7 @@ def readingCli(*args):
     
     try:
         import getopt
-        args, files = getopt.gnu_getopt(sys.argv[3:], shortArgs, longArgs)
+        args, _ = getopt.gnu_getopt(sys.argv[3:], shortArgs, longArgs)
         for k in args:
             if k[0] == '-q' or k[0] == "--sequence": 
                 sequence_filename = k[1]
@@ -778,7 +776,7 @@ def cadnano_oxdna(output_file, cadsys, lattice_type, input_sequences=None, side=
 
     sequences = randomSequenceGenerator(cadsys) if input_sequences is None else input_sequences
 
-    is_1strand_in_multiple_vhelixes_special_case = len(sequences) == 1 and len(cadsys.vhelices) > 1
+    is_1strand_in_multiple_vhelixes_special_case = len(sequences) == 1 and len(map_file.vhelices) > 1
     # 1strand_in_multiple_vhelixes_special_case: 1 strand system (i.e. NOT double helix) across many vhelices and defined with 1 .sqs line
     if is_1strand_in_multiple_vhelixes_special_case:
         base.Logger.log("One line detected in the sequence file. Since the cadnano file contains more than 1 virtual helix, the sequence found will be used as we were dealing with a single-strand system", base.Logger.INFO)
@@ -1106,20 +1104,23 @@ def cadnano_oxdna(output_file, cadsys, lattice_type, input_sequences=None, side=
                     key_lst.append(key)
             return key_lst
         
+        def stringify_keys(d):
+            """Convert a dictionary's keys to strings."""
+            return {str(k): v for k, v in d.items()}
+
         pos_to_id = {}
         for pos in id_to_pos_info.values():
             if pos not in pos_to_id.keys():
-                pos_to_id[pos] = search_key(id_to_pos_info, pos)
+                pos_to_id[str(pos)] = search_key(id_to_pos_info, pos)
 
-        with open(output_file+"_cadnano2oxDNA_map.pickle", "wb") as map_dic:
-            pickle.dump(pos_to_id, map_dic, protocol=pickle.HIGHEST_PROTOCOL)
+        with open(output_file+"_cadnano2oxDNA_map.json", "w") as map_file:
+            json.dump(stringify_keys(pos_to_id), map_file)
 
         with open(output_file+"_bond_pairs.txt", "w") as pair_file:
             for k in pos_to_id.keys():
-                if k[2] == True:
-                    if (k[0], k[1], False) in pos_to_id.keys():
-                        for i in range(len(pos_to_id[k])):
-                            pair_file.write("{} {}\n".format(pos_to_id[k][i], pos_to_id[(k[0],k[1],False)][i]))
+                if k[2] == True and (k[0], k[1], False) in pos_to_id.keys():
+                    for i in range(len(pos_to_id[k])):
+                        pair_file.write("{} {}\n".format(pos_to_id[k][i], pos_to_id[(k[0],k[1],False)][i]))
     
 
     # dump the spatial arrangement of the vhelices to a file
