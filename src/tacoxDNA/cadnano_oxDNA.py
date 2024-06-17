@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-
 import json
 import os
 import pickle
 import re
 import sys
+from pathlib import Path
 
 import numpy as np
 
@@ -1113,10 +1113,10 @@ def cadnano_oxdna(output_file, cadsys, lattice_type, input_sequences=None, side=
             if pos not in pos_to_id.keys():
                 pos_to_id[str(pos)] = search_key(id_to_pos_info, pos)
 
-        with open(output_file+"_cadnano2oxDNA_map.json", "w") as map_file:
+        with open(output_file.with_suffix(output_file.suffix + "_cadnano2oxDNA_map.json"), "w") as map_file:
             json.dump(stringify_keys(pos_to_id), map_file)
 
-        with open(output_file+"_bond_pairs.txt", "w") as pair_file:
+        with open(output_file.with_suffix(output_file.suffix + "_bond_pairs.txt"), "w") as pair_file:
             for k in pos_to_id.keys():
                 if k[2] == True and (k[0], k[1], False) in pos_to_id.keys():
                     for i in range(len(pos_to_id[k])):
@@ -1137,8 +1137,8 @@ def cadnano_oxdna(output_file, cadsys, lattice_type, input_sequences=None, side=
             pickle.dump((vh_vb2nuc_rev, vhelix_pattern), fout)
             print("## Wrote nucleotides' index conversion data to virt2nuc", file=sys.stderr)
 
-    topology_file = output_file + ".top"
-    configuration_file = output_file + ".oxdna"
+    topology_file = output_file.with_suffix(output_file.suffix + ".top")
+    configuration_file = output_file.with_suffix(output_file.suffix + ".oxdna")
 
     if print_oxview:
         # Find colors
@@ -1199,7 +1199,7 @@ def cadnano_oxdna(output_file, cadsys, lattice_type, input_sequences=None, side=
                     break
 
         # Print the oxview output
-        rev_sys.print_oxview_output(output_file+'.oxview')
+        rev_sys.print_oxview_output(str(output_file) + ".oxview")
 
     rev_sys.print_lorenzo_output(configuration_file, topology_file)
     
@@ -1209,7 +1209,7 @@ def cadnano_oxdna(output_file, cadsys, lattice_type, input_sequences=None, side=
 def main():
     source_file, lattice_type, sequence_filename, side, np_seed, print_lattice_id_map, print_virt2nuc, print_oxview = readingCli()
     cadsys, sequences = parsingCli(source_file, sequence_filename)
-    output_file = os.path.abspath(output_file)
+    output_file = Path(output_file).absolute()
     cadnano_oxdna(output_file, cadsys, lattice_type, sequences, side, np_seed, print_lattice_id_map, print_virt2nuc, print_oxview)
 
 
