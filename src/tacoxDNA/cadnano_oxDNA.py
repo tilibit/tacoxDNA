@@ -1113,10 +1113,23 @@ def cadnano_oxdna(output_file, cadsys, lattice_type, input_sequences=None, side=
             if pos not in pos_to_id.keys():
                 pos_to_id[str(pos)] = search_key(id_to_pos_info, pos)
 
-        with open(output_file.with_suffix(output_file.suffix + "_cadnano2oxDNA_map.json"), "w") as map_file:
+        # Check if the output_file has a suffix
+        if output_file.suffix:
+            # Get the filename without the suffix
+            stem = output_file.stem
+
+            # Append your string to the stem and add the suffix back
+            map_file_name = output_file.with_name(stem + "_cadnano2oxDNA_map" + output_file.suffix)
+            pair_file_name = output_file.with_name(stem + "_bond_pairs" + output_file.suffix)
+        else:
+            # Just append your string to the filename
+            map_file_name = output_file.with_name(output_file.name + "_cadnano2oxDNA_map")
+            pair_file_name = output_file.with_name(output_file.name + "_bond_pairs")
+
+        with open(map_file_name, "w") as map_file:
             json.dump(stringify_keys(pos_to_id), map_file)
 
-        with open(output_file.with_suffix(output_file.suffix + "_bond_pairs.txt"), "w") as pair_file:
+        with open(pair_file_name, "w") as pair_file:
             for k in pos_to_id.keys():
                 if k[2] == True and (k[0], k[1], False) in pos_to_id.keys():
                     for i in range(len(pos_to_id[k])):
