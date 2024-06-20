@@ -1115,14 +1115,9 @@ def cadnano_oxdna(output_file, cadsys, lattice_type, input_sequences=None, side=
 
         # Check if the output_file has a suffix
         if output_file.suffix:
-            # Get the filename without the suffix
-            stem = output_file.stem
-
-            # Append your string to the stem and add the suffix back
-            map_file_name = output_file.with_name(stem + "_cadnano2oxDNA_map" + output_file.suffix)
-            pair_file_name = output_file.with_name(stem + "_bond_pairs" + output_file.suffix)
+            map_file_name = output_file.with_suffix(output_file.suffix + "_cadnano2oxDNA_map.json")
+            pair_file_name = output_file.with_suffix(output_file.suffix + "_bond_pairs.txt")
         else:
-            # Just append your string to the filename
             map_file_name = output_file.with_name(output_file.name + "_cadnano2oxDNA_map")
             pair_file_name = output_file.with_name(output_file.name + "_bond_pairs")
 
