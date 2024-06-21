@@ -776,7 +776,7 @@ def cadnano_oxdna(output_file, cadsys, lattice_type, input_sequences=None, side=
 
     sequences = randomSequenceGenerator(cadsys) if input_sequences is None else input_sequences
 
-    is_1strand_in_multiple_vhelixes_special_case = len(sequences) == 1 and len(map_file.vhelices) > 1
+    is_1strand_in_multiple_vhelixes_special_case = len(sequences) == 1 and len(cadsys.vhelices) > 1
     # 1strand_in_multiple_vhelixes_special_case: 1 strand system (i.e. NOT double helix) across many vhelices and defined with 1 .sqs line
     if is_1strand_in_multiple_vhelixes_special_case:
         base.Logger.log("One line detected in the sequence file. Since the cadnano file contains more than 1 virtual helix, the sequence found will be used as we were dealing with a single-strand system", base.Logger.INFO)
