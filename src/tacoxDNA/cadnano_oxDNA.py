@@ -1118,8 +1118,8 @@ def cadnano_oxdna(output_file, cadsys, lattice_type, input_sequences=None, side=
             map_file_name = output_file.with_suffix(output_file.suffix + "_cadnano2oxDNA_map.json")
             pair_file_name = output_file.with_suffix(output_file.suffix + "_bond_pairs.txt")
         else:
-            map_file_name = output_file.with_name(output_file.name + "_cadnano2oxDNA_map")
-            pair_file_name = output_file.with_name(output_file.name + "_bond_pairs")
+            map_file_name = output_file.with_name(output_file.name + "_cadnano2oxDNA_map.json")
+            pair_file_name = output_file.with_name(output_file.name + "_bond_pairs.txt")
 
         with open(map_file_name, "w") as map_file:
             json.dump(stringify_keys(pos_to_id), map_file)
