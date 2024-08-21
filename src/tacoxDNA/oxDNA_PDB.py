@@ -15,7 +15,7 @@ from .libs.pdb import FROM_OXDNA_TO_ANGSTROM
 from .libs.pdb import Nucleotide
 from .libs.readers import LorenzoReader
 
-DD12_PDB_PATH = "dd12_na.pdb"
+DD12_PDB_PATH = "resources/dd12_na.pdb"
 
 
 def print_usage():

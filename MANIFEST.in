@@ -6,3 +6,4 @@ include pyproject.toml
 include MANIFEST.in
 include logo.png
 include requirements.txt
+recursive-include src/tacoxDNA/resources *
