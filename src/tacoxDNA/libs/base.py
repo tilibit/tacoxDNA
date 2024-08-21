@@ -77,18 +77,30 @@ class Logger(object):
     debug_level = INFO
 
     messages = ("DEBUG", "INFO", "WARNING", "CRITICAL")
+    is_enables = True
 
     @staticmethod
     def log(msg, level=None, additional=None):
-        if level == None: 
-            level = Logger.INFO
-        if level < Logger.debug_level: 
+        if not Logger.is_enables:
             return
 
-        if additional != None and Logger.debug_level == Logger.DEBUG:
-            print("%s: %s (additional info: '%s')" % (Logger.messages[level], msg, additional), file=sys.stderr)
-        else: 
-            print("%s: %s" % (Logger.messages[level], msg), file=sys.stderr)
+        if level is None:
+            level = Logger.INFO
+        if level < Logger.debug_level:
+            return
+
+        if additional is not None and Logger.debug_level == Logger.DEBUG:
+            print(f"{Logger.messages[level]}: {msg} (additional info: '{additional}')", file=sys.stderr)
+        else:
+            print(f"{Logger.messages[level]}: {msg}", file=sys.stderr)
+
+    @staticmethod
+    def disable():
+        Logger.is_enables = False
+
+    @staticmethod
+    def enable():
+        Logger.is_enables = True
 
     @staticmethod
     def die(msg):
