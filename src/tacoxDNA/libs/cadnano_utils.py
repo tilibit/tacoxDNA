@@ -413,3 +413,114 @@ class vhelix_vbase_to_nucleotide(object):
         else:
             return 0
 
+
+# UTILS to extract sequence data encoded in the fashion of loops and skips
+
+def remove_skips(vs_sequence, skip):
+    sequence = []
+    index_to_save = [i for i, value in enumerate(skip) if value == 0]
+    for i in index_to_save:
+        sequence.append(vs_sequence[i])
+
+    return sequence
+
+
+def split_loops(vs_sequence):
+    sequence = []
+    for i in vs_sequence:
+        sequence = sequence + list(i)
+
+    return sequence
+
+
+def convert_base(base, conversion_rule):
+    base = base.upper()
+    if base not in BASE_VOCABULARY:
+        raise KeyError
+    else:
+        return conversion_rule[base]
+
+
+def complementary_sequence(sequence):
+    complement = []
+    for base in list(sequence):
+        if base == EMPTY:
+            complement.append(EMPTY)
+        else:
+            complement.append(convert_base(base, COMPLEMENTARY_BASE))
+
+    return "".join(complement)
+
+
+def set_helix_orientation(sequence, num):
+    reverse = True if (num % 2) != 0 else False
+    if sequence == EMPTY:
+        return sequence
+    if reverse:
+        return sequence[::-1]
+    else:
+        return sequence
+
+
+def combine_scaf_staples(scaffold_sequence, staple_sequence):
+    sequence = []
+    for s_scaf, s_staple in zip(scaffold_sequence, staple_sequence):
+        seq = s_scaf if s_scaf != EMPTY else complementary_sequence(s_staple)
+        sequence.append(seq)
+
+    return sequence
+
+
+RNG = np.random.default_rng(seed=0)
+
+
+def convert_to_numeric_sequence(vs_sequence):
+    sequence = []
+    for i in vs_sequence:
+        if i == EMPTY:
+            sequence.append(0)
+        elif i in UNKNOWN_BASE:
+            sequence.append(RNG.integers(0, 4))
+        else:
+            sequence.append(convert_base(i, BASE_TO_NUMBER))
+
+    return sequence
+
+
+def check_input(virtual_strand):
+    def unknown_type_check(raw_sequence):
+        sequence = raw_sequence.upper()
+        return "?" if sequence in UNKNOWN_BASE else sequence
+
+    # replace N or n with "?" to avoid errors
+    for sequence_type in ["scafSeq", "stapSeq"]:
+        virtual_strand[sequence_type] = [unknown_type_check(sequence) for sequence in virtual_strand[sequence_type]]
+
+    # check sequence lengths (fixing legacy error)
+    new_virtual_strand = {}
+    new_virtual_strand["scafSeq"] = virtual_strand["scafSeq"][: len(virtual_strand["scaf"])]
+    new_virtual_strand["stapSeq"] = virtual_strand["stapSeq"][: len(virtual_strand["scaf"])]
+    new_virtual_strand["num"] = virtual_strand["num"]
+    new_virtual_strand["skip"] = virtual_strand["skip"]
+    ### we know new_virtual_strand["scafSeq"]: : List[str] all uppercase
+
+    return new_virtual_strand
+
+
+def process_sequence(new_virtual_strand):
+    vs_sequence = combine_scaf_staples(new_virtual_strand["scafSeq"], new_virtual_strand["stapSeq"])
+    vs_sequence = set_helix_orientation(vs_sequence, new_virtual_strand["num"])
+    vs_sequence = remove_skips(vs_sequence, new_virtual_strand["skip"])
+    vs_sequence = split_loops(vs_sequence)
+    vs_sequence = convert_to_numeric_sequence(vs_sequence)
+
+    return vs_sequence
+
+
+def parse_sequence(jsonobject):
+    scaffold_sequence = []
+    for virtual_strand in jsonobject["vstrands"]:
+        new_virtual_strand = check_input(virtual_strand)
+        scaffold_sequence.append(process_sequence(new_virtual_strand))
+
+    return scaffold_sequence
